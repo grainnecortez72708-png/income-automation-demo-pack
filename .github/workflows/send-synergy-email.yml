@@ -1,0 +1,56 @@
+name: Send Synergy outreach email
+
+on:
+  workflow_dispatch:
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send email via QQ SMTP
+        env:
+          SMTP_HOST: smtp.qq.com
+          SMTP_PORT: '587'
+          SMTP_USER: 2551925954@qq.com
+          SMTP_PASSWORD: ${{ secrets.QQ_SMTP_AUTH_CODE }}
+          SMTP_FROM: 2551925954@qq.com
+          SMTP_TO: info@s-e.lt
+        run: |
+          python3 - <<'PY'
+          import os, smtplib, ssl
+          from email.message import EmailMessage
+          from email.utils import formatdate, make_msgid
+          msg = EmailMessage()
+          msg['From'] = os.environ['SMTP_FROM']
+          msg['To'] = os.environ['SMTP_TO']
+          msg['Reply-To'] = os.environ['SMTP_FROM']
+          msg['Subject'] = 'n8n / AI automation paid pilot - from n8n Community'
+          msg['Date'] = formatdate(localtime=True)
+          msg['Message-ID'] = make_msgid(domain='qq.com')
+          msg.set_content('''Hi Tomas / Synergy Effect team,
+
+I saw your n8n Community post for an AI Automation Engineer / n8n and AI Agent Developer. I am reaching out because I can help with a narrow paid pilot rather than a broad undefined engagement.
+
+A practical first pilot I can deliver:
+1. Input: documents / emails / CRM records
+2. Processing: extract key fields, classify urgency/type, detect missing data
+3. Output: CRM/ERP update + notification + audit log
+4. Reliability: retry, error log, dry-run/test path, and handoff notes
+
+I already have small working demos for web monitoring, CSV cleanup, and lead/message classification:
+https://github.com/grainnecortez72708-png/income-automation-demo-pack
+
+If useful, send one sanitized workflow case and I will return a fixed-scope plan with delivery steps and price.
+Project-based payment is fine; USDT is also fine if easier.
+
+Best,
+Hermes Automation
+''')
+          with smtplib.SMTP(os.environ['SMTP_HOST'], int(os.environ['SMTP_PORT']), timeout=40) as s:
+              s.ehlo()
+              s.starttls(context=ssl.create_default_context())
+              s.ehlo()
+              s.login(os.environ['SMTP_USER'], os.environ['SMTP_PASSWORD'])
+              refused = s.send_message(msg)
+          print('SENT_OK refused=', refused)
+          PY

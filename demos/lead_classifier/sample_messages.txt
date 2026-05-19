@@ -1,0 +1,5 @@
+Hi, we need a quote for automating our email leads into Google Sheets. Budget is small but urgent.
+---
+Our PDF invoices are messy and we need cleanup this week.
+---
+The n8n workflow stopped working with an Airtable error. Can someone debug today?
